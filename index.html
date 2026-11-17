@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jóvenes que Inspiran | Votaciones</title>
+<meta name="description" content="Vota por los Jóvenes que Inspiran. Quinta Gala de la Juventud de Villa Rica, Cauca. Tu voto cuenta.">
+<meta name="theme-color" content="#0b0b0d">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Votaciones Jóvenes que Inspiran 🏆">
+<meta property="og:description" content="Quinta Gala de la Juventud de Villa Rica, Cauca. Elige a los jóvenes que inspiran. ¡Tu voto cuenta!">
+<meta property="og:image" content="https://i.ibb.co/sdJt3zGq/logo-cmj-sin-fondo.png">
+<meta property="og:url" content="https://cmjvillarica01.github.io/votacion/">
+<meta property="og:locale" content="es_CO">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="https://i.ibb.co/sdJt3zGq/logo-cmj-sin-fondo.png">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
@@ -68,10 +77,10 @@
   .cat h2 { margin: 22px 4px 12px; font-size: 22px; color: var(--texto); border-left: 6px solid var(--amarillo); padding-left: 10px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
   .nom { position: relative; background: var(--negro2); border: 1px solid var(--borde); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
-         transition: transform .2s, border-color .2s; }
+         transition: transform .2s, border-color .2s; animation: subir .45s ease backwards; }
   .nom:hover { transform: translateY(-3px); border-color: var(--amarillo); }
   .nom.elegido { border-color: var(--verde); box-shadow: 0 0 0 2px rgba(31,178,107,.35); }
-  .nom.lider { border-color: var(--amarillo); }
+  .nom.lider { border-color: var(--amarillo); animation: subir .45s ease backwards, brillo 2.6s ease-in-out infinite; }
   .insignia { position: absolute; top: 10px; left: 10px; z-index: 2; background: var(--amarillo); color: #000; font-size: 12px; font-weight: 800;
               padding: 5px 10px; border-radius: 999px; display: none; }
   .nom.lider .insignia { display: block; }
@@ -111,6 +120,28 @@
   #confeti { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
   footer { text-align: center; color: var(--suave); font-size: 12px; padding: 0 16px 30px; line-height: 1.6; }
 
+  @keyframes subir { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes brillo { 50% { box-shadow: 0 0 20px rgba(255,196,0,.45); } }
+  #compartir { display: flex; gap: 10px; flex-wrap: wrap; }
+  #compartir .btn { flex: 1 1 200px; text-align: center; }
+  .btn.wa { background: var(--verde); color: #fff; }
+  #progreso { display: none; }
+  #progreso .txt { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--suave); margin-bottom: 8px; }
+  #progreso .txt b { color: var(--texto); }
+  #progreso .barra { height: 10px; }
+  #progreso .gracias { margin-top: 10px; color: var(--verde); font-weight: 700; text-align: center; }
+  #buscarBox { margin: 0 0 8px; }
+  #buscar { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--borde); background: var(--negro2); color: var(--texto); font-size: 15px; font-family: inherit; }
+  #buscar:focus { outline: 2px solid var(--amarillo); border-color: var(--amarillo); }
+  #sinres { display: none; text-align: center; color: var(--suave); padding: 20px; }
+  .podio { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; }
+  .podio:empty { display: none; }
+  .podio span { background: var(--negro2); border: 1px solid var(--borde); border-radius: 999px; padding: 6px 12px; font-size: 13px; }
+  #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; padding: 16px; z-index: 80; cursor: zoom-out; }
+  #lightbox.on { display: flex; }
+  #lightbox img { max-width: 100%; max-height: 82vh; border-radius: 14px; object-fit: contain; }
+  #lightbox p { margin: 0; color: var(--amarillo); font-weight: 700; font-size: 18px; text-align: center; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   @media (max-width: 640px) {
     header { padding: 18px 12px 40px; }
     #logos img { height: 60px; }
@@ -135,15 +166,22 @@
 
 <main>
   <section id="reloj" class="card"></section>
+  <section id="compartir" class="card">
+    <a class="btn wa" id="btnWa" target="_blank" rel="noopener">💬 Compartir por WhatsApp</a>
+    <button class="btn sec" id="btnCopiar" type="button">🔗 Copiar enlace</button>
+  </section>
   <section id="pasos" class="card">
     <div class="paso"><i>1</i><span>Inicia sesión con tu cuenta de Google</span></div>
     <div class="paso"><i>2</i><span>Elige tu nominado en cada categoría</span></div>
     <div class="paso"><i>3</i><span>Confirma tu voto. ¡No se puede cambiar!</span></div>
   </section>
   <section id="sesion" class="card"></section>
+  <section id="progreso" class="card"></section>
   <div id="aviso"></div>
   <section id="total" class="card"></section>
+  <div id="buscarBox"><input id="buscar" type="search" placeholder="🔍 Buscar nominado por nombre..." autocomplete="off"></div>
   <nav id="chips"></nav>
+  <p id="sinres">No encontramos ese nombre. Prueba con otra palabra.</p>
   <div id="lista"></div>
 </main>
 
@@ -159,11 +197,13 @@
 </div></div>
 <div id="toast"></div>
 <canvas id="confeti"></canvas>
+<div id="lightbox"><img alt=""><p></p></div>
 
 <script>
 /* ============ CONFIGURACIÓN: pega aquí tu enlace /exec ============ */
 const URL_API = 'https://script.google.com/macros/s/AKfycbwt8LvtsU8QxynxEC0OIWrGjoUwY5F3_GVvAvwHPNRFVWpDDbCzuWS6jl0vIb-9LH_ejw/exec';
 const TURNSTILE_KEY = '0x4AAAAAAGFNMu7VxNkOmnCe';
+const PAGINA = 'https://cmjvillarica01.github.io/votacion/';
 const CLIENT_ID = '1060005434748-885u2j79fhv4hvtda941q6ujhda8l47f.apps.googleusercontent.com';
 /* ================================================================== */
 
@@ -183,6 +223,8 @@ let catActiva = 'Todas';
 let cargado = false;
 let errorCarga = '';
 let gisListo = false;
+let podios = {};
+let termino = '';
 let tsId = null;
 let tsToken = '';
 
@@ -193,6 +235,32 @@ function el(tag, cls, text) {
   if (text !== undefined) e.textContent = text;
   return e;
 }
+function norm(t) { return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+const sinAnim = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function poner(num, v) {
+  const desde = num._v === undefined ? 0 : num._v;
+  num._v = v;
+  if (desde === v || sinAnim || document.hidden) { num.textContent = v; return; }
+  const t0 = performance.now(), dur = 600;
+  (function paso(t) {
+    if (num._v !== v) return;
+    const k = Math.min(1, (t - t0) / dur);
+    num.textContent = Math.round(desde + (v - desde) * k);
+    if (k < 1) requestAnimationFrame(paso);
+  })(t0);
+}
+function completo() {
+  const c = categorias();
+  return c.length > 0 && c.every(x => mine[x]);
+}
+function abrirFoto(n) {
+  const lb = $('lightbox');
+  lb.querySelector('img').src = n.foto.replace(/sz=w\d+/, 'sz=w1000');
+  lb.querySelector('p').textContent = n.nombre;
+  lb.className = 'on';
+}
+$('lightbox').onclick = () => { $('lightbox').className = ''; };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('lightbox').className = ''; });
 function inicial(n) { return (n || '?').trim().charAt(0).toUpperCase(); }
 function ahoraServidor() { return Date.now() + offset; }
 function fase() {
@@ -361,15 +429,55 @@ function pintarChips() {
   });
 }
 function aplicarFiltro() {
+  let total = 0;
   document.querySelectorAll('.cat').forEach(s => {
-    s.style.display = (catActiva === 'Todas' || s.dataset.cat === catActiva) ? '' : 'none';
+    const catOk = termino ? true : (catActiva === 'Todas' || s.dataset.cat === catActiva);
+    let visibles = 0;
+    s.querySelectorAll('.nom').forEach(c => {
+      const ok = !termino || c.dataset.nombre.indexOf(termino) >= 0;
+      c.style.display = ok ? '' : 'none';
+      if (ok) visibles++;
+    });
+    s.style.display = (catOk && visibles > 0) ? '' : 'none';
+    total += catOk ? visibles : 0;
   });
+  $('sinres').style.display = (termino && total === 0) ? 'block' : 'none';
+}
+function pintarPodios() {
+  const medallas = ['🥇', '🥈', '🥉'];
+  const por = {};
+  estado.nominados.forEach(n => { if (!esBlanco(n) && n.votos > 0) (por[n.categoria] = por[n.categoria] || []).push(n); });
+  Object.keys(podios).forEach(cat => {
+    const p = podios[cat];
+    p.textContent = '';
+    const top = (por[cat] || []).sort((a, b) => b.votos - a.votos).slice(0, 3);
+    let pos = 0;
+    top.forEach((n, i) => {
+      if (i > 0 && n.votos !== top[i - 1].votos) pos = i;
+      p.appendChild(el('span', '', medallas[pos] + ' ' + n.nombre + ' · ' + n.votos));
+    });
+  });
+}
+function pintarProgreso() {
+  const cont = $('progreso');
+  const cats = categorias();
+  if (!email || !cats.length) { cont.style.display = 'none'; return; }
+  const hechas = cats.filter(c => mine[c]).length;
+  cont.style.display = 'block';
+  cont.textContent = '';
+  const txt = el('div', 'txt');
+  txt.appendChild(el('span', '', 'Tu progreso'));
+  txt.appendChild(el('b', '', 'Has votado en ' + hechas + ' de ' + cats.length + ' categorías'));
+  const barra = el('div', 'barra'); const rel = el('div'); rel.style.width = Math.round(hechas * 100 / cats.length) + '%'; barra.appendChild(rel);
+  cont.appendChild(txt); cont.appendChild(barra);
+  if (hechas === cats.length) cont.appendChild(el('div', 'gracias', '🎉 ¡Votaste en todas las categorías! Gracias por participar.'));
 }
 
 function construir() {
   const cont = $('lista');
   cont.textContent = '';
   refs = {};
+  podios = {};
   if (!categorias().includes(catActiva)) catActiva = 'Todas';
   const cats = {};
   estado.nominados.forEach(n => { (cats[n.categoria] = cats[n.categoria] || []).push(n); });
@@ -377,10 +485,13 @@ function construir() {
     const sec = el('section', 'cat');
     sec.dataset.cat = cat;
     sec.appendChild(el('h2', '', cat));
+    const podio = el('div', 'podio'); podios[cat] = podio; sec.appendChild(podio);
     const grid = el('div', 'grid');
-    cats[cat].forEach(n => {
+    cats[cat].forEach((n, idx) => {
       const blanco = esBlanco(n);
       const card = el('article', 'nom' + (blanco ? ' blanco' : ''));
+      card.dataset.nombre = norm(n.nombre);
+      card.style.animationDelay = Math.min(idx * 45, 450) + 'ms';
       card.appendChild(el('div', 'insignia', '🏆 Va a la cabeza'));
       const foto = el('div', 'foto');
       if (n.foto && !blanco) {
@@ -389,6 +500,7 @@ function construir() {
         img.onerror = () => { img.remove(); foto.textContent = inicial(n.nombre); };
         img.src = n.foto; foto.appendChild(img);
       } else { foto.textContent = blanco ? '∅' : inicial(n.nombre); }
+      if (n.foto && !blanco) { foto.style.cursor = 'zoom-in'; foto.onclick = () => { if (foto.querySelector('img')) abrirFoto(n); }; }
       const info = el('div', 'info');
       info.appendChild(el('h3', '', n.nombre));
       const votos = el('div', 'votos');
@@ -418,7 +530,7 @@ function actualizar() {
   });
   estado.nominados.forEach(n => {
     const r = refs[n.id]; if (!r) return;
-    r.num.textContent = n.votos;
+    poner(r.num, n.votos);
     const tot = totales[n.categoria] || 0;
     r.rel.style.width = (tot ? Math.round(n.votos * 100 / tot) : 0) + '%';
     r.card.classList.toggle('lider', !esBlanco(n) && n.votos > 0 && n.votos === maximo[n.categoria] && empate[n.categoria] === 1);
@@ -433,6 +545,8 @@ function actualizar() {
     else { r.btn.textContent = esBlanco(n) ? 'Votar en blanco' : 'Votar'; r.btn.disabled = votando; }
   });
   pintarTotal();
+  pintarPodios();
+  pintarProgreso();
 }
 
 function pintarTodo() {
@@ -482,7 +596,7 @@ $('modalSi').onclick = async () => {
     if (r && r.ok) {
       mine = r.mine || mine;
       if (r.publico) { estado = r.publico; offset = estado.ahora - Date.now(); }
-      toast('¡Voto registrado! Gracias por participar.', 'ok');
+      toast(completo() ? '🎉 ¡Votaste en todas las categorías! Gracias por participar.' : '¡Voto registrado! Gracias por participar.', 'ok');
       lanzarConfeti();
     } else {
       toast((r && r.msg) || 'No se pudo registrar el voto.', 'error');
@@ -559,6 +673,17 @@ window.addEventListener('load', () => {
     else if (++intentos > 50) clearInterval(t);
   }, 200);
 });
+$('buscar').oninput = e => { termino = norm(e.target.value.trim()); aplicarFiltro(); };
+$('btnWa').href = 'https://wa.me/?text=' + encodeURIComponent('Vota por los Jóvenes que Inspiran 🏆 Quinta Gala de la Juventud, Villa Rica - Cauca. ¡Tu voto cuenta! ' + PAGINA);
+$('btnCopiar').onclick = async () => {
+  try { await navigator.clipboard.writeText(PAGINA); }
+  catch (e) {
+    const t = document.createElement('textarea'); t.value = PAGINA; document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); } catch (e2) {}
+    t.remove();
+  }
+  toast('Enlace copiado. ¡Compártelo!', 'ok');
+};
 iniciar();
 </script>
 </body>
