@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jóvenes que Inspiran | Votaciones</title>
+<link rel="icon" href="https://i.ibb.co/sdJt3zGq/logo-cmj-sin-fondo.png">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --negro: #0b0b0d; --negro2: #16161a; --negro3: #1f1f25;
+    --amarillo: #ffc400; --verde: #1fb26b; --rojo: #e53935;
+    --texto: #f3f3f5; --suave: #a2a2ae; --borde: #2c2c34;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+         background: var(--negro); color: var(--texto); min-height: 100vh; }
+  header { position: relative; text-align: center; padding: 26px 16px 44px; overflow: hidden;
+           background: radial-gradient(1200px 300px at 50% -10%, rgba(255,196,0,.22), transparent 70%), var(--negro2);
+           border-bottom: 4px solid var(--amarillo); }
+  header::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+           background: linear-gradient(90deg, var(--amarillo) 0 34%, var(--verde) 34% 67%, var(--rojo) 67% 100%); }
+  #logos { display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  #logos img { height: 78px; max-width: 220px; object-fit: contain; }
+  h1 { margin: 6px 0 6px; font-size: clamp(22px, 5.2vw, 40px); letter-spacing: .5px; color: var(--amarillo); text-transform: uppercase; }
+  header p { margin: 0; color: var(--texto); opacity: .9; font-size: clamp(13px, 3vw, 18px); letter-spacing: 1.5px; }
+  main { max-width: 1060px; margin: -22px auto 40px; padding: 0 14px; position: relative; }
+  .card { background: var(--negro2); border: 1px solid var(--borde); border-radius: 18px; padding: 18px; margin-bottom: 16px;
+          box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+
+  #reloj { text-align: center; }
+  #reloj .etiqueta { font-weight: 700; color: var(--suave); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
+  .cuenta { display: flex; justify-content: center; gap: 10px; }
+  .caja { background: var(--negro); border: 1px solid var(--amarillo); color: var(--amarillo); border-radius: 14px; min-width: 72px; padding: 10px 6px; }
+  .caja b { display: block; font-size: clamp(24px, 7vw, 36px); font-variant-numeric: tabular-nums; }
+  .caja span { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: 1px; }
+  .cerrada { font-size: 20px; font-weight: 800; color: var(--amarillo); }
+
+  #pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .paso { background: var(--negro3); border-radius: 14px; padding: 12px; display: flex; gap: 10px; align-items: center; font-size: 14px; }
+  .paso i { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-weight: 800; color: #000; }
+  .paso:nth-child(1) i { background: var(--amarillo); }
+  .paso:nth-child(2) i { background: var(--verde); }
+  .paso:nth-child(3) i { background: var(--rojo); color: #fff; }
+
+  #sesion { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  #sesion p { margin: 0; color: var(--suave); font-size: 14px; flex: 1 1 220px; }
+  #sesion p b { color: var(--texto); word-break: break-all; }
+  #gbtn { min-height: 44px; }
+  .btn { display: inline-block; border: 0; border-radius: 12px; padding: 12px 18px; font-size: 15px; font-weight: 700;
+         background: var(--amarillo); color: #000; cursor: pointer; text-decoration: none; font-family: inherit; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.sec { background: transparent; color: var(--amarillo); border: 1px solid var(--amarillo); }
+  .aviso { background: rgba(229,57,53,.12); color: #ff8a86; border: 1px solid rgba(229,57,53,.45); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; }
+
+  #total { text-align: center; color: var(--suave); font-size: 14px; }
+  #total strong { color: var(--verde); font-size: 26px; font-variant-numeric: tabular-nums; margin-right: 4px; }
+  #total .punto { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--rojo); margin-right: 6px; animation: pulso 1.4s infinite; }
+  @keyframes pulso { 50% { opacity: .25; } }
+
+  #chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 6px; scrollbar-width: thin; }
+  .chip { flex: none; border: 1px solid var(--borde); background: var(--negro2); color: var(--texto); padding: 9px 14px; border-radius: 999px;
+          font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+  .chip.on { background: var(--amarillo); color: #000; border-color: var(--amarillo); }
+
+  .cat h2 { margin: 22px 4px 12px; font-size: 22px; color: var(--texto); border-left: 6px solid var(--amarillo); padding-left: 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .nom { position: relative; background: var(--negro2); border: 1px solid var(--borde); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+         transition: transform .2s, border-color .2s; }
+  .nom:hover { transform: translateY(-3px); border-color: var(--amarillo); }
+  .nom.elegido { border-color: var(--verde); box-shadow: 0 0 0 2px rgba(31,178,107,.35); }
+  .nom.lider { border-color: var(--amarillo); }
+  .insignia { position: absolute; top: 10px; left: 10px; z-index: 2; background: var(--amarillo); color: #000; font-size: 12px; font-weight: 800;
+              padding: 5px 10px; border-radius: 999px; display: none; }
+  .nom.lider .insignia { display: block; }
+  .foto { aspect-ratio: 1 / 1; background: var(--negro3); display: flex; align-items: center; justify-content: center;
+          font-size: 64px; font-weight: 800; color: var(--amarillo); }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .info h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+  .votos { font-size: 14px; color: var(--suave); }
+  .votos strong { font-size: 26px; color: var(--texto); font-variant-numeric: tabular-nums; }
+  .barra { height: 8px; border-radius: 6px; background: var(--negro3); overflow: hidden; }
+  .barra div { height: 100%; width: 0; background: linear-gradient(90deg, var(--amarillo), var(--verde)); transition: width .6s ease; }
+  .nom .btn { margin-top: auto; width: 100%; text-align: center; }
+  .nom .btn:disabled { background: var(--negro3); color: var(--suave); cursor: not-allowed; filter: none; }
+  .nom .btn.hecho:disabled { background: var(--verde); color: #fff; }
+
+  .nom.blanco { background: var(--negro); border-style: dashed; }
+  .nom.blanco .foto { color: var(--suave); font-size: 54px; }
+  .nom.blanco .btn { background: transparent; color: var(--suave); border: 1px solid var(--suave); }
+  .nom.blanco .btn:disabled { border-color: var(--borde); }
+  .nom.blanco.elegido { border-color: var(--verde); }
+  .nom.blanco .barra div { background: var(--suave); }
+
+  #modal { position: fixed; inset: 0; background: rgba(0,0,0,.72); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  #modal.on { display: flex; }
+  #modal .panel { background: var(--negro2); border: 1px solid var(--amarillo); border-radius: 18px; padding: 24px; max-width: 400px; width: 100%; text-align: center; }
+  #modal .panel p { margin: 0 0 18px; line-height: 1.5; }
+  #modal .acciones { display: flex; gap: 10px; }
+  #modal .acciones .btn { flex: 1; }
+  #toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--negro3); color: #fff; border: 1px solid var(--borde);
+           padding: 13px 18px; border-radius: 12px; font-size: 14px; display: none; z-index: 60; max-width: 92%; text-align: center; }
+  #toast.on { display: block; }
+  #toast.error { background: var(--rojo); border-color: var(--rojo); }
+  #toast.ok { background: var(--verde); border-color: var(--verde); }
+  #confeti { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
+  footer { text-align: center; color: var(--suave); font-size: 12px; padding: 0 16px 30px; line-height: 1.6; }
+
+  @media (max-width: 640px) {
+    header { padding: 18px 12px 40px; }
+    #logos img { height: 60px; }
+    #pasos { grid-template-columns: 1fr; }
+    .caja { min-width: 64px; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .info { padding: 10px; }
+    .info h3 { font-size: 15px; }
+    .votos strong { font-size: 22px; }
+    .btn { padding: 11px 12px; font-size: 14px; }
+    #sesion .btn { width: 100%; text-align: center; }
+  }
+  @media (max-width: 360px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div id="logos"></div>
+  <h1 id="titulo">Votación Premios Jóvenes que Inspiran</h1>
+  <p id="subtitulo">Quinta edición de la Gala de la Juventud</p>
+</header>
+
+<main>
+  <section id="reloj" class="card"></section>
+  <section id="pasos" class="card">
+    <div class="paso"><i>1</i><span>Inicia sesión con tu cuenta de Google</span></div>
+    <div class="paso"><i>2</i><span>Elige tu nominado en cada categoría</span></div>
+    <div class="paso"><i>3</i><span>Confirma tu voto. ¡No se puede cambiar!</span></div>
+  </section>
+  <section id="sesion" class="card"></section>
+  <div id="aviso"></div>
+  <section id="total" class="card"></section>
+  <nav id="chips"></nav>
+  <div id="lista"></div>
+</main>
+
+<footer>Un voto por cuenta de Google en cada categoría. Los votos se actualizan automáticamente.<br>Consejo Municipal de Juventud de Villa Rica, Cauca</footer>
+
+<div id="modal"><div class="panel">
+  <p id="modalTexto"></p>
+  <div class="acciones">
+    <button class="btn sec" id="modalNo">Cancelar</button>
+    <button class="btn" id="modalSi">Confirmar voto</button>
+  </div>
+</div></div>
+<div id="toast"></div>
+<canvas id="confeti"></canvas>
+
+<script>
+/* ============ CONFIGURACIÓN: pega aquí tu enlace /exec ============ */
+const URL_API = 'https://script.google.com/macros/s/AKfycbwt8LvtsU8QxynxEC0OIWrGjoUwY5F3_GVvAvwHPNRFVWpDDbCzuWS6jl0vIb-9LH_ejw/exec';
+const CLIENT_ID = '1060005434748-885u2j79fhv4hvtda941q6ujhda8l47f.apps.googleusercontent.com';
+/* ================================================================== */
+
+let estado = { nominados: [], ahora: Date.now(), inicio: 0, fin: 0 };
+let titulos = null;
+let offset = 0;
+let cred = '';
+let email = '';
+let credExp = 0;
+let mine = {};
+let firmaActual = '';
+let refs = {};
+let faseActual = '';
+let votando = false;
+let pendiente = null;
+let catActiva = 'Todas';
+let cargado = false;
+let errorCarga = '';
+let gisListo = false;
+
+const $ = id => document.getElementById(id);
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function inicial(n) { return (n || '?').trim().charAt(0).toUpperCase(); }
+function ahoraServidor() { return Date.now() + offset; }
+function fase() {
+  const t = ahoraServidor();
+  return t < estado.inicio ? 'antes' : (t > estado.fin ? 'cerrada' : 'abierta');
+}
+function esBlanco(n) { return /voto\s+en\s+blanco/i.test(n.nombre); }
+function toast(msg, tipo) {
+  const t = $('toast');
+  t.textContent = msg; t.className = 'on ' + (tipo || '');
+  clearTimeout(toast.h); toast.h = setTimeout(() => { t.className = ''; }, 4500);
+}
+
+/* ---------- Comunicación con Apps Script ---------- */
+async function api(cuerpo) {
+  const r = await fetch(URL_API, { method: 'POST', body: JSON.stringify(cuerpo) });
+  return r.json();
+}
+async function cargarEstado() {
+  const r = await fetch(URL_API + '?t=' + Date.now());
+  const d = await r.json();
+  if (!d || !d.ok) throw new Error('estado');
+  estado = d; offset = d.ahora - Date.now();
+  if (!titulos) titulos = d;
+  return d;
+}
+
+/* ---------- Encabezado ---------- */
+function pintarEncabezado(d) {
+  if (d.titulo) $('titulo').textContent = d.titulo;
+  if (d.subtitulo) $('subtitulo').textContent = d.subtitulo;
+  const cont = $('logos');
+  cont.textContent = '';
+  (d.logos || []).filter(Boolean).forEach(u => {
+    const img = new Image();
+    img.alt = 'Logo'; img.referrerPolicy = 'no-referrer';
+    img.onerror = () => img.remove();
+    img.src = u; cont.appendChild(img);
+  });
+}
+
+/* ---------- Cuenta regresiva ---------- */
+function caja(valor, texto) {
+  const c = el('div', 'caja');
+  c.appendChild(el('b', '', String(valor).padStart(2, '0')));
+  c.appendChild(el('span', '', texto));
+  return c;
+}
+function pintarReloj() {
+  const cont = $('reloj');
+  cont.textContent = '';
+  if (!cargado) { cont.appendChild(el('div', 'etiqueta', 'Cargando...')); return; }
+  const f = fase();
+  if (f === 'cerrada') { cont.appendChild(el('div', 'cerrada', 'La votación ha finalizado. ¡Gracias por participar!')); return; }
+  const objetivo = f === 'antes' ? estado.inicio : estado.fin;
+  let s = Math.max(0, Math.floor((objetivo - ahoraServidor()) / 1000));
+  const d = Math.floor(s / 86400); s -= d * 86400;
+  const h = Math.floor(s / 3600); s -= h * 3600;
+  const m = Math.floor(s / 60); s -= m * 60;
+  cont.appendChild(el('div', 'etiqueta', f === 'antes' ? 'La votación inicia en' : 'La votación termina en'));
+  const fila = el('div', 'cuenta');
+  fila.appendChild(caja(d, 'días')); fila.appendChild(caja(h, 'horas'));
+  fila.appendChild(caja(m, 'min')); fila.appendChild(caja(s, 'seg'));
+  cont.appendChild(fila);
+}
+
+/* ---------- Sesión con Google ---------- */
+function decodificar(token) {
+  try {
+    const p = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(atob(p).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  } catch (e) { return null; }
+}
+function guardarSesion(token) {
+  const p = decodificar(token);
+  if (!p || !p.email || !p.exp || p.exp * 1000 < Date.now()) return false;
+  cred = token; email = p.email; credExp = p.exp * 1000;
+  try { sessionStorage.setItem('cred', token); } catch (e) {}
+  return true;
+}
+function cerrarSesion() {
+  cred = ''; email = ''; credExp = 0; mine = {};
+  try { sessionStorage.removeItem('cred'); } catch (e) {}
+  try { if (window.google && google.accounts) google.accounts.id.disableAutoSelect(); } catch (e) {}
+}
+function restaurarSesion() {
+  try {
+    const t = sessionStorage.getItem('cred');
+    if (t && !guardarSesion(t)) sessionStorage.removeItem('cred');
+  } catch (e) {}
+}
+function pintarSesion() {
+  const cont = $('sesion');
+  cont.textContent = '';
+  if (email) {
+    const p = el('p', '');
+    p.appendChild(document.createTextNode('Votando como '));
+    p.appendChild(el('b', '', email));
+    cont.appendChild(p);
+    const b = el('button', 'btn sec', 'Cambiar de cuenta');
+    b.onclick = () => { cerrarSesion(); pintarSesion(); pintarTodo(); };
+    cont.appendChild(b);
+  } else {
+    cont.appendChild(el('p', '', 'Inicia sesión con tu cuenta de Google para poder votar.'));
+    const g = el('div'); g.id = 'gbtn';
+    cont.appendChild(g);
+    dibujarBotonGoogle();
+  }
+}
+function dibujarBotonGoogle() {
+  const g = $('gbtn');
+  if (!g) return;
+  if (!(window.google && google.accounts && google.accounts.id)) {
+    g.textContent = 'Cargando inicio de sesión...';
+    return;
+  }
+  if (!gisListo) {
+    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: alIniciar, auto_select: false, cancel_on_tap_outside: true });
+    gisListo = true;
+  }
+  g.textContent = '';
+  google.accounts.id.renderButton(g, { theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', locale: 'es', width: Math.min(280, window.innerWidth - 80) });
+}
+async function alIniciar(resp) {
+  if (!resp || !resp.credential || !guardarSesion(resp.credential)) { toast('No se pudo iniciar sesión.', 'error'); return; }
+  pintarSesion();
+  await cargarMios();
+  pintarTodo();
+}
+async function cargarMios() {
+  if (!cred) return;
+  try {
+    const r = await api({ accion: 'mios', idToken: cred });
+    if (r && r.ok) mine = r.mine || {};
+    else if (r && r.codigo === 'sesion') { cerrarSesion(); pintarSesion(); toast('Tu sesión expiró. Inicia sesión de nuevo.', 'error'); }
+  } catch (e) { toast('No se pudo consultar tus votos. Revisa tu conexión.', 'error'); }
+}
+
+/* ---------- Total ---------- */
+function pintarTotal() {
+  const cont = $('total');
+  cont.textContent = '';
+  const t = estado.nominados.reduce((a, n) => a + n.votos, 0);
+  cont.appendChild(el('span', 'punto'));
+  cont.appendChild(el('strong', '', String(t)));
+  cont.appendChild(document.createTextNode(t === 1 ? 'voto registrado en vivo' : 'votos registrados en vivo'));
+}
+
+/* ---------- Nominados ---------- */
+function firma() { return estado.nominados.map(n => [n.categoria, n.id, n.nombre, n.foto].join('|')).join('~'); }
+function categorias() {
+  const c = [];
+  estado.nominados.forEach(n => { if (c.indexOf(n.categoria) < 0) c.push(n.categoria); });
+  return c;
+}
+function pintarChips() {
+  const cont = $('chips');
+  cont.textContent = '';
+  const cats = categorias();
+  if (cats.length < 2) return;
+  ['Todas'].concat(cats).forEach(c => {
+    const b = el('button', 'chip' + (c === catActiva ? ' on' : ''), c);
+    b.onclick = () => { catActiva = c; pintarChips(); aplicarFiltro(); };
+    cont.appendChild(b);
+  });
+}
+function aplicarFiltro() {
+  document.querySelectorAll('.cat').forEach(s => {
+    s.style.display = (catActiva === 'Todas' || s.dataset.cat === catActiva) ? '' : 'none';
+  });
+}
+
+function construir() {
+  const cont = $('lista');
+  cont.textContent = '';
+  refs = {};
+  if (!categorias().includes(catActiva)) catActiva = 'Todas';
+  const cats = {};
+  estado.nominados.forEach(n => { (cats[n.categoria] = cats[n.categoria] || []).push(n); });
+  Object.keys(cats).forEach(cat => {
+    const sec = el('section', 'cat');
+    sec.dataset.cat = cat;
+    sec.appendChild(el('h2', '', cat));
+    const grid = el('div', 'grid');
+    cats[cat].forEach(n => {
+      const blanco = esBlanco(n);
+      const card = el('article', 'nom' + (blanco ? ' blanco' : ''));
+      card.appendChild(el('div', 'insignia', '🏆 Va a la cabeza'));
+      const foto = el('div', 'foto');
+      if (n.foto && !blanco) {
+        const img = new Image();
+        img.alt = n.nombre; img.referrerPolicy = 'no-referrer'; img.loading = 'lazy';
+        img.onerror = () => { img.remove(); foto.textContent = inicial(n.nombre); };
+        img.src = n.foto; foto.appendChild(img);
+      } else { foto.textContent = blanco ? '∅' : inicial(n.nombre); }
+      const info = el('div', 'info');
+      info.appendChild(el('h3', '', n.nombre));
+      const votos = el('div', 'votos');
+      const num = el('strong', '', '0');
+      votos.appendChild(num); votos.appendChild(document.createTextNode(' votos'));
+      const barra = el('div', 'barra'); const rel = el('div'); barra.appendChild(rel);
+      const btn = el('button', 'btn', 'Votar');
+      btn.onclick = () => pedirConfirmacion(n);
+      info.appendChild(votos); info.appendChild(barra); info.appendChild(btn);
+      card.appendChild(foto); card.appendChild(info); grid.appendChild(card);
+      refs[n.id] = { card, num, rel, btn };
+    });
+    sec.appendChild(grid); cont.appendChild(sec);
+  });
+  pintarChips();
+  aplicarFiltro();
+}
+
+function actualizar() {
+  const f = fase();
+  const totales = {}, maximo = {}, empate = {};
+  estado.nominados.forEach(n => {
+    totales[n.categoria] = (totales[n.categoria] || 0) + n.votos;
+    if (esBlanco(n)) return;
+    if (!(n.categoria in maximo) || n.votos > maximo[n.categoria]) { maximo[n.categoria] = n.votos; empate[n.categoria] = 1; }
+    else if (n.votos === maximo[n.categoria]) empate[n.categoria]++;
+  });
+  estado.nominados.forEach(n => {
+    const r = refs[n.id]; if (!r) return;
+    r.num.textContent = n.votos;
+    const tot = totales[n.categoria] || 0;
+    r.rel.style.width = (tot ? Math.round(n.votos * 100 / tot) : 0) + '%';
+    r.card.classList.toggle('lider', !esBlanco(n) && n.votos > 0 && n.votos === maximo[n.categoria] && empate[n.categoria] === 1);
+    const miVoto = mine[n.categoria];
+    r.card.classList.toggle('elegido', miVoto === n.id);
+    r.btn.classList.toggle('hecho', miVoto === n.id);
+    if (miVoto === n.id) { r.btn.textContent = '✓ Tu voto'; r.btn.disabled = true; }
+    else if (miVoto) { r.btn.textContent = 'Ya votaste en esta categoría'; r.btn.disabled = true; }
+    else if (f === 'antes') { r.btn.textContent = 'Aún no inicia'; r.btn.disabled = true; }
+    else if (f === 'cerrada') { r.btn.textContent = 'Votación cerrada'; r.btn.disabled = true; }
+    else if (!email) { r.btn.textContent = 'Inicia sesión para votar'; r.btn.disabled = true; }
+    else { r.btn.textContent = esBlanco(n) ? 'Votar en blanco' : 'Votar'; r.btn.disabled = votando; }
+  });
+  pintarTotal();
+}
+
+function pintarTodo() {
+  const f = firma();
+  if (f !== firmaActual) { construir(); firmaActual = f; }
+  actualizar();
+}
+
+/* ---------- Votar ---------- */
+function pedirConfirmacion(n) {
+  if (credExp && credExp < Date.now()) {
+    cerrarSesion(); pintarSesion(); pintarTodo();
+    toast('Tu sesión expiró. Inicia sesión de nuevo para votar.', 'error');
+    return;
+  }
+  pendiente = n;
+  $('modalTexto').textContent = esBlanco(n)
+    ? '¿Confirmas tu voto en blanco en la categoría «' + n.categoria + '»? No podrás cambiarlo.'
+    : '¿Confirmas tu voto por «' + n.nombre + '» en la categoría «' + n.categoria + '»? No podrás cambiarlo.';
+  $('modal').className = 'on';
+}
+$('modalNo').onclick = () => { $('modal').className = ''; pendiente = null; };
+$('modalSi').onclick = async () => {
+  const n = pendiente;
+  $('modal').className = ''; pendiente = null;
+  if (!n || votando) return;
+  votando = true; actualizar();
+  try {
+    const r = await api({ accion: 'votar', idToken: cred, nominadoId: n.id });
+    if (r && r.ok) {
+      mine = r.mine || mine;
+      if (r.publico) { estado = r.publico; offset = estado.ahora - Date.now(); }
+      toast('¡Voto registrado! Gracias por participar.', 'ok');
+      lanzarConfeti();
+    } else {
+      toast((r && r.msg) || 'No se pudo registrar el voto.', 'error');
+      if (r && r.codigo === 'sesion') { cerrarSesion(); pintarSesion(); }
+      else if (r && /Ya votaste/i.test(r.msg || '')) await cargarMios();
+    }
+  } catch (e) {
+    toast('Error de conexión. Inténtalo de nuevo.', 'error');
+  }
+  votando = false;
+  pintarTodo();
+};
+
+/* ---------- Confeti ---------- */
+function lanzarConfeti() {
+  const c = $('confeti'), g = c.getContext('2d');
+  c.width = innerWidth; c.height = innerHeight;
+  const colores = ['#ffc400', '#1fb26b', '#e53935', '#ffffff'];
+  const ps = Array.from({ length: 120 }, () => ({
+    x: c.width / 2, y: c.height * 0.55, vx: (Math.random() - .5) * 16, vy: -Math.random() * 16 - 4,
+    s: 5 + Math.random() * 6, col: colores[Math.floor(Math.random() * 4)], r: Math.random() * 6
+  }));
+  let n = 0;
+  (function paso() {
+    g.clearRect(0, 0, c.width, c.height);
+    ps.forEach(p => { p.vy += .4; p.x += p.vx; p.y += p.vy; p.r += .2; g.save(); g.translate(p.x, p.y); g.rotate(p.r); g.fillStyle = p.col; g.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .6); g.restore(); });
+    if (++n < 110) requestAnimationFrame(paso); else g.clearRect(0, 0, c.width, c.height);
+  })();
+}
+
+/* ---------- Actualización en tiempo real ---------- */
+async function refrescar() {
+  if (document.hidden || votando) return;
+  try { await cargarEstado(); errorCarga = ''; pintarTodo(); } catch (e) {}
+}
+
+/* ---------- Inicio ---------- */
+async function iniciar() {
+  restaurarSesion();
+  pintarSesion();
+  pintarReloj();
+  if (URL_API.indexOf('PEGA_AQUI') === 0) {
+    $('aviso').appendChild(el('div', 'aviso', 'Falta configurar la dirección del servidor (URL_API) en el archivo index.html.'));
+    return;
+  }
+  try {
+    const d = await cargarEstado();
+    cargado = true;
+    pintarEncabezado(d);
+    pintarTodo();
+    pintarReloj();
+    faseActual = fase();
+    if (email) { await cargarMios(); pintarSesion(); pintarTodo(); }
+  } catch (e) {
+    $('aviso').appendChild(el('div', 'aviso', 'No se pudo cargar la votación. Recarga la página en unos segundos.'));
+  }
+  setInterval(() => {
+    pintarReloj();
+    if (!cargado) return;
+    const f = fase();
+    if (f !== faseActual) { faseActual = f; actualizar(); }
+    if (credExp && credExp < Date.now() && email) {
+      cerrarSesion(); pintarSesion(); pintarTodo();
+      toast('Tu sesión expiró. Inicia sesión de nuevo para votar.', 'error');
+    }
+  }, 1000);
+  setInterval(refrescar, Math.max(5, (titulos && titulos.refresco) || 8) * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refrescar(); });
+}
+window.addEventListener('load', () => {
+  let intentos = 0;
+  const t = setInterval(() => {
+    if (window.google && google.accounts && google.accounts.id) { clearInterval(t); if (!email) dibujarBotonGoogle(); }
+    else if (++intentos > 50) clearInterval(t);
+  }, 200);
+});
+iniciar();
+</script>
+</body>
+</html>
