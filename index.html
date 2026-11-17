@@ -6,6 +6,7 @@
 <title>Jóvenes que Inspiran | Votaciones</title>
 <link rel="icon" href="https://i.ibb.co/sdJt3zGq/logo-cmj-sin-fondo.png">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 <style>
   :root {
     --negro: #0b0b0d; --negro2: #16161a; --negro3: #1f1f25;
@@ -98,6 +99,8 @@
   #modal.on { display: flex; }
   #modal .panel { background: var(--negro2); border: 1px solid var(--amarillo); border-radius: 18px; padding: 24px; max-width: 400px; width: 100%; text-align: center; }
   #modal .panel p { margin: 0 0 18px; line-height: 1.5; }
+  #tsBox { display: flex; justify-content: center; min-height: 65px; margin: 0 0 16px; }
+  #modal .btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
   #modal .acciones { display: flex; gap: 10px; }
   #modal .acciones .btn { flex: 1; }
   #toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--negro3); color: #fff; border: 1px solid var(--borde);
@@ -148,6 +151,7 @@
 
 <div id="modal"><div class="panel">
   <p id="modalTexto"></p>
+  <div id="tsBox"></div>
   <div class="acciones">
     <button class="btn sec" id="modalNo">Cancelar</button>
     <button class="btn" id="modalSi">Confirmar voto</button>
@@ -159,6 +163,7 @@
 <script>
 /* ============ CONFIGURACIÓN: pega aquí tu enlace /exec ============ */
 const URL_API = 'https://script.google.com/macros/s/AKfycbwt8LvtsU8QxynxEC0OIWrGjoUwY5F3_GVvAvwHPNRFVWpDDbCzuWS6jl0vIb-9LH_ejw/exec';
+const TURNSTILE_KEY = '0x4AAAAAAGFNMu7VxNkOmnCe';
 const CLIENT_ID = '1060005434748-885u2j79fhv4hvtda941q6ujhda8l47f.apps.googleusercontent.com';
 /* ================================================================== */
 
@@ -178,6 +183,8 @@ let catActiva = 'Todas';
 let cargado = false;
 let errorCarga = '';
 let gisListo = false;
+let tsId = null;
+let tsToken = '';
 
 const $ = id => document.getElementById(id);
 function el(tag, cls, text) {
@@ -446,15 +453,32 @@ function pedirConfirmacion(n) {
     ? '¿Confirmas tu voto en blanco en la categoría «' + n.categoria + '»? No podrás cambiarlo.'
     : '¿Confirmas tu voto por «' + n.nombre + '» en la categoría «' + n.categoria + '»? No podrás cambiarlo.';
   $('modal').className = 'on';
+  prepararTurnstile();
+}
+function prepararTurnstile() {
+  tsToken = '';
+  $('modalSi').disabled = true;
+  if (!(window.turnstile && turnstile.render)) {
+    toast('No se pudo cargar la verificación. Recarga la página.', 'error');
+    return;
+  }
+  if (tsId !== null) { turnstile.reset(tsId); return; }
+  tsId = turnstile.render('#tsBox', {
+    sitekey: TURNSTILE_KEY, theme: 'dark', language: 'es',
+    callback: t => { tsToken = t; $('modalSi').disabled = false; },
+    'expired-callback': () => { tsToken = ''; $('modalSi').disabled = true; },
+    'error-callback': () => { tsToken = ''; $('modalSi').disabled = true; toast('No se pudo verificar. Recarga la página.', 'error'); }
+  });
 }
 $('modalNo').onclick = () => { $('modal').className = ''; pendiente = null; };
 $('modalSi').onclick = async () => {
   const n = pendiente;
+  const tk = tsToken; tsToken = '';
   $('modal').className = ''; pendiente = null;
-  if (!n || votando) return;
+  if (!n || votando || !tk) return;
   votando = true; actualizar();
   try {
-    const r = await api({ accion: 'votar', idToken: cred, nominadoId: n.id });
+    const r = await api({ accion: 'votar', idToken: cred, nominadoId: n.id, turnstile: tk });
     if (r && r.ok) {
       mine = r.mine || mine;
       if (r.publico) { estado = r.publico; offset = estado.ahora - Date.now(); }
